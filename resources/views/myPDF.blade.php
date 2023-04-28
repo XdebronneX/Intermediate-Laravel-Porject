@@ -1,5 +1,4 @@
 {{-- <html>
-
 <head>
     <style type="text/css">
         /** Define the margins of your page **/
@@ -159,7 +158,7 @@
                                                                                                 {{ $record->service_cost }}
                                                                                             </td>
                                                                                         </tr>
-                                                                                        <?php $total = $total + $record->service_cost; ?>
+                                                                                    <?php $total = $total + $record->service_cost; ?>
                                                                                     @endforeach
 
                                                                                     <tr class="total">

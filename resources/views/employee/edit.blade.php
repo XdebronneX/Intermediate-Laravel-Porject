@@ -96,7 +96,7 @@
   <div>
     <label for="position">Position</label>
     {!! Form::select('position', array('Veterinarian' => 'veterinarian', 'Groomer' => 'groomer',
-    'Receptionist' => 'receptionist'), null, ['emp_id' => 'position', 'class' => 'form-control',]); !!}
+    'Receptionist' => 'receptionist'), null, ['emp_id' => 'position', 'class' => 'form-control',]) !!}
     @if ($errors->has('position'))
     <p>{{ $errors->first('position') }}</p>
     @endif

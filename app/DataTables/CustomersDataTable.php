@@ -27,7 +27,8 @@ class CustomersDataTable extends DataTable
             ->addColumn('action', 'customers.action')*/
 
         // $customers = Customer::with('pets');
-        $customers = Customer::withTrashed()->with('pets','users')->orderBy('customer_id','DESC');
+        // $customers = Customer::withTrashed()->with('pets','users')->orderBy('customer_id','DESC');
+        $customers = Customer::withTrashed()->with(['users','pets']);
        //$customers =  Customer::with(['user','pets.pet_name'])->select('customers.*');
 
         return datatables()

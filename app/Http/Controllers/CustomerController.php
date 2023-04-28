@@ -313,7 +313,8 @@ class CustomerController extends Controller
 
 //  ! yung withTrashed pwedeng sa model na lang
     // $customers = Customer::withTrashed()->with('pets', 'users')->orderBy('customer_id','DESC');
-     $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
+    //  $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
+    $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
         //dd($customers);
         return $dataTable->render('customer.customers', compact('customers'));
     }
