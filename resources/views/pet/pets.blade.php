@@ -1,101 +1,102 @@
 @extends('layouts.main')
 @section('body')
-    {{-- @section('content') --}}
-    <div class="container">
-        <br />
-        @if (Session::has('success'))
-            <div class="alert alert-success">
-                <p>{{ Session::get('success') }}</p>
-            </div><br />
-        @endif
-        {{-- <div>
-            <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#petModal">
-                    create new pet</button>
-          
-        </div> --}}
-        <div class="col-xs-6">
-            <form method="post" enctype="multipart/form-data" action="{{ url('/pet/import') }}">
-                @csrf
-                <input type="file" id="uploadName" name="pet_upload" required>
+  <div class="container mx-auto px-6 py-10">
+    <br />
+    <div class="mb-8">
+      <form method="post" enctype="multipart/form-data" action="{{ url('/pet/import') }}">
+        @csrf
+        <div class="flex items-center justify-between mb-4">
+          <input type="file" id="uploadName" name="pet_upload" required class="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]">
+          <button type="submit" class="ml-4 py-2 px-4 bg-[#626F47] text-white rounded-lg shadow-md hover:bg-[#A4B465] focus:outline-none focus:ring-2 focus:ring-[#FFCF50]">
+            Import Excel File
+          </button>
         </div>
         @error('pet_upload')
-            <small>{{ $message }}</small>
+          <small class="text-red-500">{{ $message }}</small>
         @enderror
-        <button type="submit" class="btn btn-info btn-primary ">Import Excel File</button>
-        </form>
-        <div>
-            {{ $dataTable->table(['class' => 'table table-bordered table-striped table-hover '], true) }}
-        </div>
-        <div class="modal" id="petModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document" style="width:75%;">
-                <div class="modal-content">
-                    <div class="modal-header text-center">
-                        <p class="modal-title w-100 font-weight-bold">Add New Pet</p>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="post" action="{{route('pet.store')}}" enctype="multipart/form-data" >
-                        @csrf
-                        <div class="md-form mb-5"> </div>
-                        <div style="position: absolute; top: -9999px; left: -9999px;">
-                        <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Owner name</label>
-        {!! Form::text('customer_id', App\Models\Customer::where('user_id', Auth::id())->pluck('customer_id')->first(),
-                                ['readonly'], null,['class' => 'form-control validate',]) !!}
-                           </div>
-                            <div class="md-form mb-5"> </div>
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Pet name</label>
-                          <input type="text" class="form-control " id="pname" name="pname" value="{{old('pname')}}"placeholder="Pet name">
-                          @if($errors->has('pname'))
-                          <div class="alert alert-danger">{{ $errors->first('pname') }}</div>
-                         @endif 
-                       
-                        <div class="md-form mb-5"> </div>
-                        <label data-error="wrong" data-success="right" for="name"
-                        style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Gender</label>
-                          <input type="gender" class="form-control" id="gender" name="gender" value="{{old('gender')}}" placeholder="Gender">
-                          @if($errors->has('gender'))
-                          <div class="alert alert-danger">{{ $errors->first('gender') }}</div>
-                         @endif 
-                        
-                        <div class="md-form mb-5"> </div>
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Breed</label>
-                              <input type="breed" class="form-control" id="breed" name="breed" value="{{old('breed')}}" placeholder="Breed">
-                              @if($errors->has('breed'))
-                              <div class="alert alert-danger">{{ $errors->first('breed') }}</div>
-                             @endif 
-                         
-                            <div class="md-form mb-5"> </div>
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Age</label>
-                          <input type="number" class="form-control" id="age" name="age" value="{{old('age')}}" placeholder="Age">
-                          @if($errors->has('age'))
-                          <div class="alert alert-danger">{{ $errors->first('age') }}</div>
-                         @endif 
-                       
-                        <div class="md-form mb-5"> </div>
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Image</label>
-                          <input type="file" class="form-control" id="image" name="image">
-                          @error('image')
-                          <div class="alert alert-danger">{{ $message }}</div>
-                          @enderror
-                     
-                        <div class="modal-footer d-flex justify-content-center">
-                            <button type="submit" class="btn btn-success">Save</button>
-                            <button class="btn btn-light" data-dismiss="modal">Cancel</button>
-                        </div>
-
-                </div>
-                </form>
-            </div>
-        </div>
+      </form>
     </div>
-    @push('scripts')
-        {{ $dataTable->scripts() }}
-    @endpush
+
+    <div>
+      {{ $dataTable->table(['class' => 'table table-bordered table-striped table-hover '], true) }}
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="petModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document" style="width:75%;">
+        <div class="modal-content bg-white shadow-lg rounded-lg">
+          <div class="modal-header text-center bg-[#626F47] text-white py-4 rounded-t-lg">
+            <p class="modal-title w-100 font-bold text-xl">Add New Pet</p>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form method="post" action="{{route('pet.store')}}" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-body mx-3">
+              
+              <input type="hidden" name="customer_id" value="{{ App\Models\Customer::where('user_id', Auth::id())->pluck('customer_id')->first() }}">
+
+              <div class="mb-5">
+                <label for="pname" class="block font-semibold text-[#626F47]">Pet Name</label>
+                <input type="text" id="pname" name="pname" value="{{old('pname')}}" class="form-control w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]" placeholder="Pet name">
+                @error('pname')
+                  <div class="text-red-500">{{ $message }}</div>
+                @enderror
+              </div>
+
+              <div class="mb-5">
+                <label for="gender" class="block font-semibold text-[#626F47]">Gender</label>
+                <input type="text" id="gender" name="gender" value="{{old('gender')}}" class="form-control w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]" placeholder="Gender">
+                @error('gender')
+                  <div class="text-red-500">{{ $message }}</div>
+                @enderror
+              </div>
+
+              <div class="mb-5">
+                <label for="breed" class="block font-semibold text-[#626F47]">Breed</label>
+                <input type="text" id="breed" name="breed" value="{{old('breed')}}" class="form-control w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]" placeholder="Breed">
+                @error('breed')
+                  <div class="text-red-500">{{ $message }}</div>
+                @enderror
+              </div>
+
+              <div class="mb-5">
+                <label for="age" class="block font-semibold text-[#626F47]">Age</label>
+                <input type="number" id="age" name="age" value="{{old('age')}}" class="form-control w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]" placeholder="Age">
+                @error('age')
+                  <div class="text-red-500">{{ $message }}</div>
+                @enderror
+              </div>
+
+              <div class="mb-5">
+                <label for="image" class="block font-semibold text-[#626F47]">Image</label>
+                <input type="file" id="image" name="image" class="form-control w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A4B465]">
+                @error('image')
+                  <div class="text-red-500">{{ $message }}</div>
+                @enderror
+              </div>
+
+            </div>
+
+            <div class="modal-footer flex justify-between bg-[#FFCF50] py-4 rounded-b-lg">
+              <button type="submit" class="btn btn-success bg-[#626F47] text-white py-2 px-6 rounded-lg hover:bg-[#A4B465] focus:outline-none focus:ring-2 focus:ring-[#FFCF50]">
+                Save
+              </button>
+              <button class="btn btn-light text-[#626F47] py-2 px-6 rounded-lg hover:bg-[#F2F2F2]" data-dismiss="modal">
+                Cancel
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+@push('scripts')
+  {!! $dataTable->scripts() !!}
+@endpush
+
 @endsection

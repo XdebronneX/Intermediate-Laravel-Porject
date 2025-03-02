@@ -1,190 +1,45 @@
 @extends('layouts.main')
+
 @section('body')
-    <style>
-        * {
-            outline: none;
-        }
-
-        html,
-        body {
-            height: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            margin: 0;
-            background-color: #ffd8d8;
-        }
-
-        .tb {
-            display: table;
-            width: 100%;
-        }
-
-        .td {
-            display: table-cell;
-            vertical-align: middle;
-        }
-
-        input,
-        button {
-            color: #fff;
-            font-family: Nunito;
-            padding: 0;
-            margin: 0;
-            border: 0;
-            background-color: transparent;
-        }
-
-        #cover {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            width: 550px;
-            padding: 35px;
-            margin: -83px auto 0 auto;
-            background-color: #ff7575;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px #ff7c7c, 0 0 0 20px #ffffffeb;
-            transform: scale(0.6);
-        }
-
-        form {
-            height: 96px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            height: 96px;
-            font-size: 60px;
-            line-height: 1;
-        }
-
-        input[type="text"]::placeholder {
-            color: #e16868;
-        }
-
-        #s-cover {
-            width: 1px;
-            padding-left: 35px;
-        }
-
-        button {
-            position: relative;
-            display: block;
-            width: 84px;
-            height: 96px;
-            cursor: pointer;
-        }
-
-        #s-circle {
-            position: relative;
-            top: -8px;
-            left: 0;
-            width: 43px;
-            height: 43px;
-            margin-top: 0;
-            border-width: 15px;
-            border: 15px solid #fff;
-            background-color: transparent;
-            border-radius: 50%;
-            transition: 0.5s ease all;
-        }
-
-        button span {
-            position: absolute;
-            top: 68px;
-            left: 43px;
-            display: block;
-            width: 45px;
-            height: 15px;
-            background-color: transparent;
-            border-radius: 10px;
-            transform: rotateZ(52deg);
-            transition: 0.5s ease all;
-        }
-
-        button span:before,
-        button span:after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 45px;
-            height: 15px;
-            background-color: #fff;
-            border-radius: 10px;
-            transform: rotateZ(0);
-            transition: 0.5s ease all;
-        }
-
-        #s-cover:hover #s-circle {
-            top: -1px;
-            width: 67px;
-            height: 15px;
-            border-width: 0;
-            background-color: #fff;
-            border-radius: 20px;
-        }
-
-        #s-cover:hover span {
-            top: 50%;
-            left: 56px;
-            width: 25px;
-            margin-top: -9px;
-            transform: rotateZ(0);
-        }
-
-        #s-cover:hover button span:before {
-            bottom: 11px;
-            transform: rotateZ(52deg);
-        }
-
-        #s-cover:hover button span:after {
-            bottom: -11px;
-            transform: rotateZ(-52deg);
-        }
-
-        #s-cover:hover button span:before,
-        #s-cover:hover button span:after {
-            right: -6px;
-            width: 40px;
-            background-color: #fff;
-        }
-    </style>
-
-
-    <div id="cover">
-        <form method="get" action="{{ route('search.petquery') }}">
-            <div class="tb">
-                <div class="td"><input type="text" name="searchPet" placeholder="Search" required></div>
-                <div class="td" id="s-cover">
-                    <button type="submit">
-                        <div id="s-circle"></div>
-                        <span></span>
-                    </button>
-
-                </div>
-            </div>
+<div class="flex items-center justify-center min-h-screen bg-[#A4B465] p-6">
+    <div class="bg-[#626F47] p-8 rounded-2xl shadow-xl w-full max-w-lg transform transition-all scale-100 hover:scale-105">
+        <form method="get" action="{{ route('search.customerquery') }}" class="flex items-center">
+            <input type="text" name="searchCustomer" placeholder="Search..." required
+                class="w-full p-4 text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded-l-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFCF50]">
+            <button type="submit" 
+                class="bg-[#FFCF50] text-[#626F47] px-6 py-4 rounded-r-lg shadow-md hover:bg-[#D9B040] transition duration-300 ease-in-out">
+                🔍
+            </button>
         </form>
     </div>
-    @if (isset($searchResults))
-        @if ($searchResults->isEmpty())
-            <h2>Sorry, no results found for the term <b>"{{ $searchterm }}"</b>.</h2>
-        @else
-            <h2>There are {{ $searchResults->count() }} results for <b>"{{ $searchterm }}"</b></h2>
-            <hr />
-            @foreach ($searchResults->groupByType() as $type => $modelSearchResults)
-                <h2>{{ ucwords($type) }}</h2>
+</div>
 
-                @foreach ($modelSearchResults as $searchResult)
-                    `
-                    <ul>
-                        <a href="{{ route('search.petshow', ['id' => $searchResult->url]) }}">{{ $searchResult->title }}</a>
-                    </ul>
-                @endforeach
+@if (isset($searchResults))
+    <div class="container mx-auto px-6 py-10">
+        @if ($searchResults->isEmpty())
+            <h2 class="text-2xl font-bold text-center text-gray-900">
+                😔 No results found for <span class="text-[#FFCF50]">"{{ $searchTerm }}"</span>.
+            </h2>
+        @else
+            <h2 class="text-2xl font-bold text-center text-gray-900">
+                🎉 Found {{ $searchResults->count() }} results for <span class="text-[#FFCF50]">"{{ $searchTerm }}"</span>.
+            </h2>
+            <hr class="my-4 border-t border-gray-300" />
+
+            @foreach ($searchResults->groupByType() as $type => $modelSearchResults)
+                <h3 class="text-xl font-semibold text-[#626F47] mt-6">{{ ucwords($type) }}</h3>
+                <ul class="list-disc ml-6 space-y-2">
+                    @foreach ($modelSearchResults as $searchResult)
+                        <li>
+                            <a href="{{ route('search.customershow', ['id' => $searchResult->url]) }}" 
+                               class="text-[#FFCF50] font-semibold hover:underline hover:text-[#D9B040] transition duration-300 ease-in-out">
+                               {{ $searchResult->title }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
             @endforeach
         @endif
-    @endif
+    </div>
+@endif
 @endsection

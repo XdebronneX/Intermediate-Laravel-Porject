@@ -120,16 +120,18 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
-    {
-         Schema::dropIfExists('customers');
-         Schema::dropIfExists('pets');
-         Schema::dropIfExists('employees');
-         Schema::dropIfExists('grooming_service');
-         Schema::dropIfExists('pet_breed');
-         Schema::dropIfExists('disease_injuries');
-         Schema::dropIfExists('grooming_info');
-         Schema::dropIfExists('groomingline');
-         Schema::dropIfExists('health_consultation');
-    }
+  public function down()
+{
+    Schema::dropIfExists('health_consultation');
+    Schema::dropIfExists('groomingline');
+    Schema::dropIfExists('grooming_info');
+    Schema::dropIfExists('comment_reviews');
+    Schema::dropIfExists('disease_injuries');
+    Schema::dropIfExists('grooming_service');
+    Schema::dropIfExists('pets');
+    Schema::dropIfExists('pet_breed'); 
+    Schema::dropIfExists('customers');
+    Schema::dropIfExists('employees');
+}
+
 };

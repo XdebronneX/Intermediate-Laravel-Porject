@@ -1,90 +1,99 @@
 @extends('layouts.main')
 @section('body')
-    {{-- @section('content') --}}
-    <div class="container">
-        <br />
-        @if (Session::has('success'))
-            <div class="alert alert-success">
-                <p>{{ Session::get('success') }}</p>
-            </div><br />
-        @endif
-        <center><div>
-            <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#petModal">
-                    create new pet</button>
-        </div>
-    </center>
-        {{-- <div>
-            {{ $dataTable->table(['class' => 'table table-bordered table-striped table-hover '], true) }}
-        </div> --}}
-        <div class="modal" id="petModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document" style="width:75%;">
-                <div class="modal-content">
-                    <div class="modal-header text-center">
-                        <p class="modal-title w-100 font-weight-bold">Add New Pet</p>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="post" action="{{route('pet.store')}}" enctype="multipart/form-data" >
-                        @csrf
-                        <div style="position: absolute; top: -9999px; left: -9999px;">
-                        <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Owner name</label>
-        {!! Form::text('customer_id', App\Models\Customer::where('user_id', Auth::id())->pluck('customer_id')->first(),
-                                ['readonly'], null,['class' => 'form-control validate',]) !!}
-                            </div>
-                        <div class="form-group"> 
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Pet name</label>
-                          <input type="text" class="form-control " id="pname" name="pname" value="{{old('pname')}}"placeholder="Pet name">
-                          @if($errors->has('pname'))
-                          <div class="alert alert-danger">{{ $errors->first('pname') }}</div>
-                         @endif 
-                        </div>
-                      <div class="form-group"> 
-                        <label data-error="wrong" data-success="right" for="name"
-                        style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Gender</label>
-                          <input type="gender" class="form-control" id="gender" name="gender" value="{{old('gender')}}" placeholder="Gender">
-                          @if($errors->has('gender'))
-                          <div class="alert alert-danger">{{ $errors->first('gender') }}</div>
-                         @endif 
-                        </div>
-                        <div class="form-group"> 
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Breed</label>
-                              <input type="breed" class="form-control" id="breed" name="breed" value="{{old('breed')}}" placeholder="Breed">
-                              @if($errors->has('breed'))
-                              <div class="alert alert-danger">{{ $errors->first('breed') }}</div>
-                             @endif 
-                            </div>
-                        <div class="form-group"> 
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Age</label>
-                          <input type="number" class="form-control" id="age" name="age" value="{{old('age')}}" placeholder="Age">
-                          @if($errors->has('age'))
-                          <div class="alert alert-danger">{{ $errors->first('age') }}</div>
-                         @endif 
-                        </div>
-                        <div class="form-group">
-                            <label data-error="wrong" data-success="right" for="name"
-                            style="display: inline-block; width: 150px; color:rgb(0, 0, 0)">Image</label>
-                          <input type="file" class="form-control" id="image" name="image">
-                          @error('image')
-                          <div class="alert alert-danger">{{ $message }}</div>
-                          @enderror
-                        </div>
-                        <div class="modal-footer d-flex justify-content-center">
-                            <button type="submit" class="btn btn-success">Save</button>
-                            <button class="btn btn-light" data-dismiss="modal">Cancel</button>
+
+<div class="container py-10">
+    <div class="flex justify-center">
+        <button type="button" class="btn bg-[#626F47] text-white px-6 py-2 rounded-lg hover:bg-[#A4B465]" 
+                data-bs-toggle="modal" data-bs-target="#petModal">
+            + Create New Pet
+        </button>
+    </div>
+
+
+    <!-- Pet Creation Modal -->
+    <div class="modal fade" id="petModal" tabindex="-1" aria-labelledby="petModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-lg shadow-lg">
+                
+                <div class="modal-header bg-[#626F47] text-white">
+                    <h5 class="modal-title w-100 text-center font-bold">Add New Pet</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('pet.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-6">
+                        
+                        <!-- Hidden Owner ID -->
+                        <input type="hidden" name="customer_id" value="{{ App\Models\Customer::where('user_id', Auth::id())->pluck('customer_id')->first() }}" class="d-none">
+
+                        <!-- Pet Name -->
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-semibold">Pet Name</label>
+                            <input type="text" name="pname" value="{{ old('pname') }}" 
+                                   class="form-control border-gray-300 rounded-lg p-2" placeholder="Enter pet name">
+                            @error('pname')
+                                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                </div>
+                        <!-- Gender & Breed -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold">Gender</label>
+                                <input type="text" name="gender" value="{{ old('gender') }}" 
+                                       class="form-control border-gray-300 rounded-lg p-2" placeholder="Enter gender">
+                                @error('gender')
+                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-semibold">Breed</label>
+                                <input type="text" name="petb_id" value="{{ old('petb_id') }}" 
+                                       class="form-control border-gray-300 rounded-lg p-2" placeholder="Enter breed">
+                                @error('petb_id')
+                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="mt-4">
+                            <label class="block text-gray-700 font-semibold">Age</label>
+                            <input type="number" name="age" value="{{ old('age') }}" 
+                                   class="form-control border-gray-300 rounded-lg p-2" placeholder="Enter age">
+                            @error('age')
+                                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mt-4">
+                            <label class="block text-gray-700 font-semibold">Upload Image</label>
+                            <input type="file" name="image" class="form-control border-gray-300 rounded-lg p-2">
+                            @error('image')
+                                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer flex justify-between px-6 py-4 bg-gray-100 rounded-b-lg">
+                        <button type="submit" class="btn bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            Save
+                        </button>
+                        <button type="button" class="btn bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400" data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                    
                 </form>
             </div>
         </div>
     </div>
-    {{-- @push('scripts')
-        {{ $dataTable->scripts() }}
-    @endpush --}}
+</div>
+
 @endsection

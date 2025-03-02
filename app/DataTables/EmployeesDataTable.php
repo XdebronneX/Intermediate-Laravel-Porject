@@ -29,14 +29,24 @@ class EmployeesDataTable extends DataTable
      
              return datatables()
                  ->eloquent($employees)
-                 ->addColumn('action', function($row) {
-                         return "<a href=". route('employee.edit', $row->emp_id). " class=\"btn btn-warning\">Edit</a> 
+                //  ->addColumn('action', function($row) {
+                //          return "<a href=". route('employee.edit', $row->emp_id). " class=\"btn btn-warning\">Edit</a> 
                        
-                        <form action=". route('employee.destroy', $row->user_id). " method= \"POST\" >". csrf_field() . '<input name="_method" type="hidden" value="DELETE">
-                         <button class="btn btn-danger" type="submit">Delete</button>
-                           </form>';
+                //         <form action=". route('employee.destroy', $row->user_id). " method= \"POST\" >". csrf_field() . '<input name="_method" type="hidden" value="DELETE">
+                //          <button class="btn btn-danger" type="submit">Delete</button>
+                //            </form>';
 
-                 })
+                //  })
+                 ->addColumn('edit', function ($row) {
+                return "<a href=" . route('employee.edit', $row->emp_id) . " class=\"btn btn-info\">Edit</a>";
+                })
+            ->addColumn('delete', function ($row) {
+                return "
+                <form action=" . route('employee.destroy', $row->user_id) . " method=\"POST\">" . csrf_field() .
+                '<input name="_method" type="hidden" value="DELETE">
+                <button class="btn btn-danger" type="submit">Delete</button>
+                </form>';
+            })
 
                  ->addColumn('users', function (Employee $employees) {
                     return $employees->users->email;
@@ -48,7 +58,7 @@ class EmployeesDataTable extends DataTable
                      })
      
 
-                 ->rawColumns(['img_path','users','action']);
+                 ->rawColumns(['img_path','users','edit','delete']);
                  // ->rawColumns(['pets','action']);
                 /*  ->addColumn('user', function (Customer $customers) {
                         // return "<p>" .$albums->artist->artist_name."</p>";
@@ -84,10 +94,8 @@ class EmployeesDataTable extends DataTable
                     ->dom('Bfrtip')
                     ->orderBy(1)
                     ->buttons(
-                        Button::make('create'),
-                        Button::make('export'),
-                        Button::make('reset'),
-                        Button::make('reload')
+                        Button::make('excel'),
+                        Button::make('csv'),
                     );
     }
 
@@ -110,9 +118,9 @@ class EmployeesDataTable extends DataTable
             Column::make('users')->name('users.email')->title('Email'),
             Column::make('created_at'),
             Column::make('updated_at'),
-            Column::computed('action')
+            Column::computed('edit'),
+            Column::computed('delete')
                   ->exportable(false)
-                  ->printable(false)
                   ->width(60)
                   ->addClass('text-center'),
         ];

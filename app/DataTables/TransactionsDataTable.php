@@ -25,18 +25,27 @@ class TransactionsDataTable extends DataTable
 
         return datatables()
             ->eloquent($transactionss)
-            ->addColumn('action', function($row) {
-                return "<a href=". route('transacts.edit', $row->groominginfo_id). " class=\"btn btn-warning\">Edit</a>
-                <form action=". route('transacts.destroy', $row->groominginfo_id). " method= \"POST\" >". csrf_field() .
-                 '<input name="_method" type="hidden" value="DELETE">
+            // ->addColumn('action', function($row) {
+            //     return "<a href=". route('transacts.edit', $row->groominginfo_id). " class=\"btn btn-warning\">Edit</a>
+            //     <form action=". route('transacts.destroy', $row->groominginfo_id). " method= \"POST\" >". csrf_field() .
+            //      '<input name="_method" type="hidden" value="DELETE">
+            //     <button class="btn btn-danger" type="submit">Delete</button>
+            //       </form>';
+            // })
+            ->addColumn('edit', function ($row) {
+                return "<a href=" . route('transacts.edit', $row->groominginfo_id) . " class=\"btn btn-info\">Edit</a>"; 
+            })
+            ->addColumn('delete', function ($row) {
+                return "
+                <form action=" . route('transacts.destroy', $row->groominginfo_id) . " method=\"POST\">" . csrf_field() .
+                '<input name="_method" type="hidden" value="DELETE">
                 <button class="btn btn-danger" type="submit">Delete</button>
-                  </form>';
-            
+                </form>';
             })
             ->addColumn('pets', function (Transaction $transactionss) {
                 return $transactionss->pets->pname;
             })
-            ->rawColumns(['pets','action']);      
+            ->rawColumns(['pets','edit','delete']);      
     }
 
     /**
@@ -64,11 +73,8 @@ class TransactionsDataTable extends DataTable
                     ->dom('Bfrtip')
                     ->orderBy(0)
                     ->buttons(
-                        Button::make('create'),
-                        Button::make('export'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
+                        Button::make('excel'),
+                        Button::make('csv'),
                     );
     }
 
@@ -86,9 +92,9 @@ class TransactionsDataTable extends DataTable
             Column::make('status')->title('Status'),
             Column::make('created_at')->title('Date_placed'),
             Column::make('updated_at'),
-            Column::computed('action')
+            Column::computed('edit'),
+            Column::computed('delete')
             ->exportable(false)
-            ->printable(false)
             ->width(60)
             ->addClass('text-center'),
         ];

@@ -139,7 +139,7 @@ class CustomerController extends Controller
     public function update(Request $request,  $customer_id)
     {
         $customer = Customer::find($customer_id);
-
+        
         $validator = Validator::make($request->all(), Customer::$rules);
 
                     if ($validator->fails()) {
@@ -314,9 +314,10 @@ class CustomerController extends Controller
 //  ! yung withTrashed pwedeng sa model na lang
     // $customers = Customer::withTrashed()->with('pets', 'users')->orderBy('customer_id','DESC');
     //  $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
-    $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
-        //dd($customers);
-        return $dataTable->render('customer.customers', compact('customers'));
+    // $customers = Customer::with('pets', 'users')->orderBy('customer_id','DESC');
+    //     //dd($customers);
+    //     return $dataTable->render('customer.customers', compact('customers'));
+        return $dataTable->render('customer.customers');
     }
 
     public function import(Request $request) {

@@ -1,147 +1,91 @@
-{{-- @extends('layouts.master')
-@section('content')
-@if ($message = Session::get('success'))
- <div class="alert alert-success alert-block">
- <button type="button" class="close" data-dismiss="alert">×</button> 
-    <strong>{{ $message }}</strong>
- </div>
-@endif
-<table class="table table-striped">
-  <tr>{{ link_to_route('customer.create', 'Add new customer:')}}</tr>
-  <thead>
-  <tr>
-    <th>Customer ID</th>
-    <th>Customer Fname</th>
-    <th>Customer Lname</th>
-    <th>Customer Address</th>
-    <th>Customer Town</th>
-    <th>Customer Zipcode</th>
-    <th>Customer Phone</th>
-    <th>Customer Zipcode</th>
-    <th colspan="1">Action</th>
-    <th colspan="1">Action</th>
-  </tr>
-</thead>
-<tbody>
-      @foreach($customers as $customer)
-      <tr>
-        <td>{{$customer->customer_id}}</td>
-        <td>{{$customer->title}}</td>
-        <td>{{$customer->lname}}</td>
-        <td>{{$customer->fname}}</td>
-        <td>{{$customer->addressline}}</td>
-        <td>{{$customer->phone}}</td>
-        <td>{{$customer->zipcode}}</td>
-        <td><img src="{{ asset('images/'.$customer->img_path) }}" width ="80" height="80" class="img-circle" enctype="multipart/form-data"/></td>
-
-        <td align="center">
-          @if($customer->deleted_at)
-            <i class="fas fa-eye" aria-hidden="true" style="font-size:24px; color:gray" ></i></a>
-          @else
-          <a href="{{ route('customer.show',$customer->customer_id) }}">
-            <i class="fas fa-eye" aria-hidden="true" style="font-size:24px" ></i></a>
-          @endif
-           </td>
-        <td align="center">
-          @if($customer->deleted_at)
-            <ii class="fas fa-user-edit" aria-hidden="true" style="font-size:24px; color:gray" ></i></a>
-          @else
-          <a href="{{route('customer.edit',$customer->customer_id)}}">
-            <i class="fas fa-user-edit" aria-hidden="true" style="font-size:24px" ></i></a>
-          @endif
-           </td>
-      <td align="center">
-          @if($customer->deleted_at)
-              <i class="fas fa-user-times" style="font-size:24px; color:gray" ></i>
-          @else
-              {!! Form::open(array('route' => array('customer.destroy', $customer->customer_id),'method'=>'DELETE')) !!}
-             <button ><i class="fas fa-user-times" style="font-size:20px; color:red" ></i></button>
-             {!! Form::close() !!}
-           @endif
-         </td>
-      </tr>
-      @endforeach
-</table>
-<div>{{$customers->links()}}</div>
-</div>
-</div>
-@endsection --}}
-
-
-
-
-
-
-
-
 @extends('layouts.main')
 
-{{-- @extends('layouts.base')
-@extends('layouts.app') --}}
 @section('content')
-<div class="container">
-    <br />
-    @if ( Session::has('success'))
-      <div class="alert alert-success">
-        <p>{{ Session::get('success') }}</p>
-      </div><br />
-     @endif
-     {{-- <form method="GET" action="{{url('artist')}}" >
-      <div class="form-group col-md-4">
-       <label for="genre">Search</label>
-       <input type="text" class="form-control" name="search" id="genre" Placeholder="Search Listener name or Album name">
+<div class="container mx-auto py-8">
+    <!-- Success Message -->
+    {{-- @if ( Session::has('success'))
+      <div class="bg-green-500 text-white px-6 py-4 mb-4 rounded-lg shadow-md flex items-center justify-between">
+        <span class="font-semibold">{{ Session::get('success') }}</span>
+        <button type="button" class="text-white" data-dismiss="alert">×</button>
+      </div>
+    @endif --}}
+
+    <!-- Search Form (Optional, If Needed) -->
+    {{-- @include('partials.search') --}}
+
+    <!-- Table -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-6 py-3 text-left text-gray-700">ID</th>
+            <th class="px-6 py-3 text-left text-gray-700">Title</th>
+            <th class="px-6 py-3 text-left text-gray-700">Fname</th>
+            <th class="px-6 py-3 text-left text-gray-700">Lname</th>
+            <th class="px-6 py-3 text-left text-gray-700">Address</th>
+            <th class="px-6 py-3 text-left text-gray-700">Phone</th>
+            <th class="px-6 py-3 text-left text-gray-700">Zipcode</th>
+            <th class="px-6 py-3 text-left text-gray-700">Pet Image</th>
+            <th class="px-6 py-3 text-left text-gray-700">Pets</th>
+            <th class="px-6 py-3 text-center text-gray-700" colspan="2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach($customers as $customer)
+            <tr class="border-t hover:bg-gray-50">
+              <td class="px-6 py-4">{{ $customer->customer_id }}</td>
+              <td class="px-6 py-4">{{ $customer->title }}</td>
+              <td class="px-6 py-4">{{ $customer->fname }}</td>
+              <td class="px-6 py-4">{{ $customer->lname }}</td>
+              <td class="px-6 py-4">{{ $customer->addressline }}</td>
+              <td class="px-6 py-4">{{ $customer->phone }}</td>
+              <td class="px-6 py-4">{{ $customer->zipcode }}</td>
+              <td class="px-6 py-4">
+                <img src="{{ asset('images/'.$customer->img_path) }}" width="80" height="80" class="rounded-full object-cover">
+              </td>
+              <td class="px-6 py-4">
+                @foreach($customer->pets as $pet)
+                  <li>{{ $pet->pname }}</li>
+                @endforeach
+              </td>
+              <td class="px-6 py-4 text-center">
+                @if($customer->deleted_at)
+                  <i class="fas fa-eye text-gray-400 text-xl"></i>
+                @else
+                  <a href="{{ route('customer.show', $customer->customer_id) }}" class="text-blue-500 hover:text-blue-700">
+                    <i class="fas fa-eye text-xl"></i>
+                  </a>
+                @endif
+              </td>
+              <td class="px-6 py-4 text-center">
+                @if($customer->deleted_at)
+                  <i class="fas fa-user-edit text-gray-400 text-xl"></i>
+                @else
+                  <a href="{{ route('customer.edit', $customer->customer_id) }}" class="text-yellow-500 hover:text-yellow-700">
+                    <i class="fas fa-user-edit text-xl"></i>
+                  </a>
+                @endif
+              </td>
+              <td class="px-6 py-4 text-center">
+                @if($customer->deleted_at)
+                  <i class="fas fa-user-times text-gray-400 text-xl"></i>
+                @else
+                  {!! Form::open(['route' => ['customer.destroy', $customer->customer_id], 'method' => 'DELETE']) !!}
+                    <button type="submit" class="text-red-500 hover:text-red-700">
+                      <i class="fas fa-user-times text-xl"></i>
+                    </button>
+                  {!! Form::close() !!}
+                @endif
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="mt-4">
+        {{ $customers->links() }}
+      </div>
     </div>
-    </form> --}}
-      @include('partials.search')
-    <table class="table table-striped">
-      <tr>{{ link_to_route('listener.create', 'Add new listener:')}}</tr>
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Fname</th>
-        <th>Lname</th>
-        <th>Address</th>
-        <th>Town</th>
-        <th>Zipcode</th>
-        <th>Phone</th>
-        <th>Zipcode</th>
-        <th>Pets</th>
-        <th colspan="1">Action</th>
-        <th colspan="1">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($customers as $customer)
-      <th>{{$customer->customer_id}}</th>
-      <th>{{$customer->title}}</th>
-      <th>{{$customer->lname}}</th>
-      <th>{{$customer->fname}}</th>
-      <th>{{$customer->addressline}}</th>
-      <th>{{$customer->phone}}</th>
-      <th>{{$customer->zipcode}}</th>
-      <th><img src="{{asset($customer->img_path) }}"width="80" height="80" /></th>
-      <th> @foreach($pet->pets as $pet)
-             <li>{{$pet->pname}} </li>   
-        @endforeach
-        </th>
-        <td><a href="{{action('CustomerController@edit', $customer->customer_id)}}" class="btn btn-warning">Edit</a></td>
-       <td>
-          <form action=" {{action('CustomerController@destroy', $customer->customer_id)}}" method="post">
-           {{ csrf_field() }}
-            <input name="_method" type="hidden" value="DELETE">
-            <button class="btn btn-danger" type="submit">Delete</button>
-          </form>
-          </td>
-      </tr>
-      @endforeach
-  </tbody>
-  </table>
-  </div>
-  @endsection
-
-
-
-
-
-
+</div>
+@endsection

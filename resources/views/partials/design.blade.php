@@ -1,118 +1,94 @@
-<style>
-    .navbar-brand {
-        color: #FFFFFF;
-        /* white */
-    }
+<nav class="bg-[#626F47] shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <!-- Left side: Logo and Links -->
+            <div class="flex space-x-6">
+                <a class="text-[#FFCF50] text-lg font-bold" href="{{ route('transact.index') }}">
+                    <span class="text-[#A4B465]">PET</span>CLINIC
+                </a>
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ url('customers') }}">Customers</a>
 
-    .signin {
-        color: #FFFFFF;
-        /* white */
-    }
+                @if (auth()->check() && auth()->user()->role === 'admin')
+                    <a class="text-white hover:text-[#A4B465] transition" href="{{ url('employees') }}">Employees</a>
+                @endif
+                
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ url('grooming') }}">Grooming Services</a>
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ url('pets') }}">Pets</a>
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ url('consults') }}">Consultation</a>
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ route('getTransacts') }}">Transaction</a>
+                <a class="text-white hover:text-[#A4B465] transition" href="{{ route('comment.pet') }}">Comment</a>
 
-    .signup {
-        color: #FFFFFF;
-        /* white */
-    }
+                @if (auth()->check() && auth()->user()->role === 'admin')
+                    <a class="text-white hover:text-[#A4B465] transition" href="{{ route('chart.groomed') }}">Chart</a>
+                @endif
+            </div>
 
-    span {
-        color: #00FF00;
-        /* lime */
-    }
+            <!-- Right side: Shopping Cart and User Management -->
+            <div class="flex space-x-6 items-center">
+                <!-- Shopping Cart -->
+                <a href="{{ route('service.shoppingCart') }}" class="relative text-white hover:text-[#FFCF50] transition">
+                    <i class="fas fa-shopping-cart text-2xl"></i>
+                    <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        {{ Session::has('cart') ? Session::get('cart')->totalQty : '0' }}
+                    </span>
+                </a>
 
-    a:hover {
-        background-color: #00FFFF;
-        color: #000000;
-    }
-</style>
-{{-- <nav class="navbar navbar-default"> --}}
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-
-            <a class="navbar-brand" href="{{ route('transact.index') }}"><strong>PET</strong><span>CLINIC</span></a>
-            <a class="navbar-brand" href="{{ url('customers') }}">Customers</a>
-            <a class="navbar-brand" href="{{ url('employees') }}">Employees</a>
-            <a class="navbar-brand" href="{{ url('grooming') }}">Grooming Services</a>
-            <a class="navbar-brand" href="{{ url('pets') }}">Pets</a>
-            <a class="navbar-brand" href="{{ url('consults') }}">Consultation</a>
-            <a class="navbar-brand" href="{{ route('getTransacts') }}">Transaction</a>
-            <a class="navbar-brand" href="{{ route('search.pet') }}">Search</a>
-            {{-- <a class="dropdown">
-                <button class="dropbtn">Search
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <a class="dropdown-content">
-                    <a href="{{ route('search.pet') }}">Pet Search</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
-                </a> --}}
-            <a class="navbar-brand" href="{{ route('comment.pet') }}">Comment</a>
-            <a class="navbar-brand" href="{{ route('chart.groomed') }}">Chart</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-
-                {{-- <li>
-                    <a class="navbar-brand" href="{{ route('customer.index') }}">Customer</a>
-
-                 </li> --}}
-                {{-- @if (Auth::check()) --}}
-                <li class="dropdown">
-                <li>
-                    <a href="{{ route('service.shoppingCart') }}">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i> Shopping Cart
-                        <span class="badge">{{ Session::has('cart') ? Session::get('cart')->totalQty : '' }}</span>
-                    </a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                        aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>
-                        User Management <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
+                <!-- User Management Dropdown -->
+                <div class="relative">
+                    <button id="userMenuButton" class="text-white bg-[#A4B465] hover:bg-[#FFCF50] py-1 px-3 rounded focus:outline-none transition duration-300">
+                        <i class="fa fa-user"></i> User Management
+                    </button>
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-[#626F47] rounded shadow-lg opacity-0 invisible transition-all duration-300 transform scale-95">
                         @if (Auth::check())
                             @if (auth()->user()->role === 'admin')
-                                <li><a href="{{ route('user.aprofile') }}"><i class="fa fa-user"></i>
-                                        <strong>{{ Auth::User()->name }}</strong><i style="font-size:15px; color:red">
-                                            {{ Auth::User()->role }}</i></a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{{ route('user.logout') }}">Logout</a></li>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.aprofile') }}">
+                                    <strong>{{ Auth::User()->name }}</strong> - Admin
+                                </a>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.logout') }}">Logout</a>
                             @elseif (auth()->user()->role === 'employee')
-                                <li><a href="{{ route('user.eprofile') }}"><i class="fa fa-user"></i>
-                                        <strong>{{ Auth::User()->name }}</strong><i style="font-size:15px; color:red">
-                                            {{ Auth::User()->role }}</i></a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{{ route('user.logout') }}">Logout</a></li>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.eprofile') }}">
+                                    <strong>{{ Auth::User()->name }}</strong> - Employee
+                                </a>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.logout') }}">Logout</a>
                             @elseif (auth()->user()->role === 'customer')
-                                <li><a href="{{ route('user.profile') }}"><i class="fa fa-user"></i>
-                                        <strong>{{ Auth::User()->name }}</strong><i style="font-size:15px; color:red">
-                                            {{ Auth::User()->role }}</i></a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{{ route('user.logout') }}">Logout</a></li>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.profile') }}">
+                                    <strong>{{ Auth::User()->name }}</strong> - Customer
+                                </a>
+                                <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.logout') }}">Logout</a>
                             @endif
                         @else
-                            <li><a href="{{ route('user.signup') }}"><i class="fas fa-user-circle"
-                                        style="color:rgb(111, 255, 0)"></i> Signup as customer</a></li>
-                            <li><a href="{{ route('user.esignup') }}"><i class="fas fa-user" style="color:blue"></i>
-                                    Signup as veterinarian</a></li>
-                            <li><a href="{{ route('user.asignup') }}"><i class="fas fa-user"
-                                        style="color:rgba(255, 0, 0, 0.545)"></i>
-                                    Signup as admin</a></li>
-                            <li><a href="{{ route('user.signin') }}">Signin</a></li>
+                            <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.signup') }}">Signup as Customer</a>
+                            <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.esignup') }}">Signup as Employee</a>
+                            <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.asignup') }}">Signup as Admin</a>
+                            <a class="text-white block px-4 py-2 text-sm hover:bg-[#A4B465] rounded transition" href="{{ route('user.signin') }}">Signin</a>
                         @endif
-                        {{-- <i class="fa-solid fa-user-crown"></i> --}}
-                    </ul>
-                </li>
-            </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </nav>
+
+<!-- JavaScript for Dropdown -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userMenuButton = document.getElementById("userMenuButton");
+        const userDropdown = document.getElementById("userDropdown");
+
+        userMenuButton.addEventListener("click", function () {
+            userDropdown.classList.toggle("opacity-0");
+            userDropdown.classList.toggle("invisible");
+            userDropdown.classList.toggle("scale-95");
+            userDropdown.classList.toggle("opacity-100");
+            userDropdown.classList.toggle("visible");
+            userDropdown.classList.toggle("scale-100");
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add("opacity-0", "invisible", "scale-95");
+                userDropdown.classList.remove("opacity-100", "visible", "scale-100");
+            }
+        });
+    });
+</script>

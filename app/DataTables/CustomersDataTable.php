@@ -20,45 +20,84 @@ class CustomersDataTable extends DataTable
      * @param mixed $query Results from query() method.
      * @return \Yajra\DataTables\DataTableAbstract
      */
+    // public function dataTable($query)
+    // {
+    // /*    return datatables()
+    //         ->eloquent($query)
+    //         ->addColumn('action', 'customers.action')*/
+
+    //     // $customers = Customer::with('pets');
+    //     // $customers = Customer::withTrashed()->with('pets','users')->orderBy('customer_id','DESC');
+    //     $customers = Customer::withTrashed()->with(['users','pets']);
+    //    //$customers =  Customer::with(['user','pets.pet_name'])->select('customers.*');
+
+    //     return datatables()
+    //         ->eloquent($customers)
+    //         ->addColumn('action', function($row) {
+    //             return "<a href=". route('customer.restore', $row->customer_id). " class=\"btn btn-warning\">Restore</a> 
+
+    //             <form action=". route('customer.destroy', $row->customer_id). " method= \"POST\" >". csrf_field() .
+    //             '<input name="_method" type="hidden" value="DELETE">
+    //             <button class="btn btn-danger" type="submit">Delete</button>
+    //               </form>';
+            
+    //         })
+    //         ->addColumn('users', function (Customer $customers) {
+    //             return $customers->users->email;
+    //         })
+            
+    //         ->addColumn('pets', function (Customer $customers) {
+    //                 return $customers->pets->map(function($pet) {
+    //                 return "<li>".$pet->pname. "</li>";
+    //                 })->implode('<br>'); 
+    //             })
+    //         ->addColumn('img_path', function ($customers) {
+    //                 $url= asset('images/'.$customers->img_path);
+    //                 return '<img src="'.$url.'" border="0" width="90" height="90" align="center">';
+    //             })
+
+    //         ->rawColumns(['img_path','pets','user','action']);      
+
+    // }
     public function dataTable($query)
-    {
-    /*    return datatables()
-            ->eloquent($query)
-            ->addColumn('action', 'customers.action')*/
-
-        // $customers = Customer::with('pets');
-        // $customers = Customer::withTrashed()->with('pets','users')->orderBy('customer_id','DESC');
-        $customers = Customer::withTrashed()->with(['users','pets']);
-       //$customers =  Customer::with(['user','pets.pet_name'])->select('customers.*');
-
-        return datatables()
-            ->eloquent($customers)
-            ->addColumn('action', function($row) {
-                return "<a href=". route('customer.restore', $row->customer_id). " class=\"btn btn-warning\">Restore</a> 
-
-                <form action=". route('customer.destroy', $row->customer_id). " method= \"POST\" >". csrf_field() .
+{
+    return datatables()
+        ->eloquent($query)
+        // ->addColumn('action', function($row) {
+        //     return "<a href=". route('customer.restore', $row->customer_id). " class=\"btn btn-warning\">Restore</a> 
+        //     <form action=". route('customer.destroy', $row->customer_id). " method= \"POST\" >". csrf_field() .
+        //     '<input name="_method" type="hidden" value="DELETE">
+        //     <button class="btn btn-danger" type="submit">Delete</button>
+        //     </form>';
+        // })
+        ->addColumn('edit', function ($row) {
+                return "<a href=" . route('customer.edit', $row->customer_id) . " class=\"btn btn-info\">Edit</a>";
+            })
+        ->addColumn('restore', function ($row) {
+                return "<a href=" . route('customer.restore', $row->customer_id) . " class=\"btn btn-warning\">Restore</a>";
+            })
+        ->addColumn('delete', function ($row) {
+                return "
+                <form action=" . route('customer.destroy', $row->customer_id) . " method=\"POST\">" . csrf_field() .
                 '<input name="_method" type="hidden" value="DELETE">
                 <button class="btn btn-danger" type="submit">Delete</button>
-                  </form>';
-            
+                </form>';
             })
-            ->addColumn('users', function (Customer $customers) {
-                return $customers->users->email;
-            })
-            
-            ->addColumn('pets', function (Customer $customers) {
-                    return $customers->pets->map(function($pet) {
-                    return "<li>".$pet->pname. "</li>";
-                    })->implode('<br>'); 
-                })
-            ->addColumn('img_path', function ($customers) {
-                    $url= asset('images/'.$customers->img_path);
-                    return '<img src="'.$url.'" border="0" width="90" height="90" align="center">';
-                })
+        ->addColumn('users', function (Customer $customer) {
+            return $customer->users->email;
+        })
+        ->addColumn('pets', function (Customer $customer) {
+            return $customer->pets->map(function($pet) {
+                return "<li>".$pet->pname. "</li>";
+            })->implode('<br>');
+        })
+        ->addColumn('img_path', function ($customer) {
+            $url = asset('images/'.$customer->img_path);
+            return '<img src="'.$url.'" border="0" width="90" height="90" align="center">';
+        })
+        ->rawColumns(['img_path','pets','users','restore','delete','edit']);
+}
 
-            ->rawColumns(['img_path','pets','user','action']);      
-
-    }
 
     /**
      * Get query source of dataTable.
@@ -85,12 +124,13 @@ class CustomersDataTable extends DataTable
                     ->dom('Bfrtip')
                     ->orderBy(3)
                     ->buttons(
-                       
-                        Button::make('export'),
-                        // Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    );
+
+                Button::make('excel'),
+                Button::make('csv'),
+                // Button::make('print'),
+                // Button::make('reset'),
+                // Button::make('reload')
+            );
     }
 
     /**
@@ -118,16 +158,17 @@ class CustomersDataTable extends DataTable
             // Column::make('title')->title('Title'),
             // Column::make('fname')->title('Fname'),
             Column::make('lname')->title('Customers'),
-            Column::make('users')->name('users.email')->title('Email'),
+            // Column::make('users')->name('users.email')->title('Email'),
             Column::make('phone')->title('Phone'),
             Column::make('img_path')->title('Image'),
             Column::make('pets')->name('pets.pname')->title('Pets'),
             Column::make('created_at'),
             Column::make('updated_at'),
             Column::make('deleted_at'),
-            Column::computed('action')
+            Column::computed('edit'),
+            Column::computed('restore'),
+            Column::computed('delete')
                   ->exportable(false)
-                  ->printable(false)
                   ->width(60)
                   ->addClass('text-center'),
         ];

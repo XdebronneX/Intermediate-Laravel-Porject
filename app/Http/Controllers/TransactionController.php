@@ -84,7 +84,7 @@ class TransactionController extends Controller
     public function update(Request $request, $groominginfo_id)
     {
         $transactions = Transaction::find($groominginfo_id);
-        $transactions->status = $request->input("status");
+        $transactions->status = $request->status;
         $transactions->update();
 
         return Redirect::to('/transacts')->with('success', 'Transaction updated!');
@@ -104,7 +104,7 @@ class TransactionController extends Controller
         return Redirect::to('/transacts')->with('success','Transaction Deleted!');
     }
 
-    public function getAddToCart(Request $request , $id)
+ public function getAddToCart(Request $request , $id)
     {
         $service = GroomingService::find($id);
         // $oldCart = Session::has('cart') ? $request->session()->get('cart'): null;
@@ -119,6 +119,8 @@ class TransactionController extends Controller
         //dd(Session::all());
          return redirect()->route('transact.index');
     }
+
+
 
     public function getCart() {
         if (!Session::has('cart')) {
@@ -143,81 +145,108 @@ class TransactionController extends Controller
          return redirect()->route('service.shoppingCart');
     }
 
-    public function storeCheckout(Request $request)
-    {
-        if (!Session::has('cart')) {
-            return redirect()->route('transact.index');
-        }
-        $oldCart = Session::get('cart');
-        $cart = new Cart($oldCart);
-        //  dd($cart);
-        try {
-             DB::beginTransaction();
-            $order = new Transaction();
-            // dd($order);
-            $order->pet_id = $request->pet_id;
-            $order->status = 'Processing';
-            // dd($order);
-            $order->save();
-            // dd($order);
-        foreach($cart->services as $services){
-                $id = $services['service']['service_id'];
-                 //dd($id);
-                 $order->services()->attach($id);
-                // DB::table('groomingline')->insert(
-                //     ['service_id' => $id,
-                //      'groominginfo_id' => $order->groominginfo_id
-                //     ]
-                //     );
-            }
-            // dd($order);
-        }
-        catch (\Exception $e) {
-            //  dd($e);
-            DB::rollback();
-            //  dd($order);
-            return redirect()->route('service.shoppingCart')->with('error', $e->getMessage());
-        }
-
-        $customershoww = Customer::join('pets','pets.customer_id','customers.customer_id')
-        ->join('grooming_info','grooming_info.pet_id','pets.pet_id')
-        ->join('groomingline','groomingline.groominginfo_id','grooming_info.groominginfo_id')
-        ->join('grooming_service','groomingline.service_id','grooming_service.service_id')
-        ->select('customers.lname', 'customers.fname', 'pets.pname', 'grooming_service.service_name')
-        ->where('customers.customer_id',$id)
-        ->get();
-
-        $maxid = DB::table('grooming_info')->where('groominginfo_id', \DB::raw("(select max(`groominginfo_id`) from grooming_info)"))->first();
-        $info = DB::table('grooming_info')
-        ->join('pets', 'grooming_info.pet_id', 'pets.pet_id')
-        ->join('customers', 'customers.customer_id', 'pets.customer_id')
-        ->select('customers.fname', 'customers.lname', 'pets.pname', 'grooming_info.created_at', 'customers.addressline', 'grooming_info.status')
-        ->where('groominginfo_id',$maxid->groominginfo_id)->first();
-        $tableee = DB::table('groomingline')
-        ->join('grooming_service', 'groomingline.service_id', 'grooming_service.service_id')
-        ->select('grooming_service.service_name', 'grooming_service.service_cost')
-        ->where('groominginfo_id',$maxid->groominginfo_id)->get();
-
-        // DB::table("rates")->get()->sum("rate_value")
-        $add = DB::table('groomingline')
-        ->join('grooming_service', 'groomingline.service_id', 'grooming_service.service_id')
-        ->select('grooming_service.service_name', 'grooming_service.service_cost')
-        ->where('groominginfo_id',$maxid->groominginfo_id)->sum('grooming_service.service_cost');
-        // dd($add);
-            $pdf = PDF::loadView('myPDF', compact('tableee', 'info', 'add'));
-
-
-
-            DB::commit();
-            return $pdf->stream('Reciept.pdf');
-            Session::forget('cart');
-
-
-            return redirect()->route('transact.index')->with('success','Successfully Purchased Your Products!!!');
-
-
-
+public function storeCheckout(Request $request)
+{
+    if (!Session::has('cart')) {
+        return redirect()->route('transact.index');
     }
+
+    // Retrieve old cart from session
+    $oldCart = Session::get('cart');
+    $cart = new Cart($oldCart);
+
+    try {
+        DB::beginTransaction();
+
+        // Create a new transaction (grooming_info)
+        $order = new Transaction();
+        $order->pet_id = $request->pet_id;
+        $order->status = 'Processing';
+
+        // Save the order and ensure it's saved properly
+        $order->save();
+
+        if (!$order->exists) {
+            dd("Order not saved!", $order);
+        }
+
+        // Ensure groominginfo_id exists
+        if (!$order->groominginfo_id) {
+            dd("groominginfo_id is missing", $order);
+        }
+
+        // Attach services to grooming_info via groomingline
+        foreach ($cart->services as $services) {
+            $id = $services['service']['service_id'];
+
+            if (!$id) {
+                dd("Service ID is missing", $services);
+            }
+
+            // Attach service with groominginfo_id
+            $order->services()->attach($id, ['groominginfo_id' => $order->groominginfo_id]);
+        }
+
+        // Fetch latest grooming_info entry
+        $maxid = DB::table('grooming_info')->latest('groominginfo_id')->first();
+
+        if (!$maxid) {
+            dd("No grooming_info record found!");
+        }
+
+        // Fetch customer and pet info
+        $info = DB::table('grooming_info')
+            ->join('pets', 'grooming_info.pet_id', 'pets.pet_id')
+            ->join('customers', 'customers.customer_id', 'pets.customer_id')
+            ->select('customers.fname', 'customers.lname', 'pets.pname', 'grooming_info.created_at', 'customers.addressline', 'grooming_info.status')
+            ->where('groominginfo_id', $maxid->groominginfo_id)
+            ->first();
+
+        if (!$info) {
+            dd("No customer info found!", $maxid);
+        }
+
+        // Fetch services linked to this grooming_info
+        $tableee = DB::table('groomingline')
+            ->join('grooming_service', 'groomingline.service_id', 'grooming_service.service_id')
+            ->select('grooming_service.service_name', 'grooming_service.service_cost')
+            ->where('groominginfo_id', $maxid->groominginfo_id)
+            ->get();
+
+        if ($tableee->isEmpty()) {
+            dd("No services found for this grooming_info!", $maxid);
+        }
+
+        // Calculate total service cost
+        $add = DB::table('groomingline')
+            ->join('grooming_service', 'groomingline.service_id', 'grooming_service.service_id')
+            ->where('groominginfo_id', $maxid->groominginfo_id)
+            ->sum('grooming_service.service_cost');
+
+        // Generate PDF receipt
+        $pdf = PDF::loadView('myPDF', compact('tableee', 'info', 'add'));
+
+        // Commit transaction
+        DB::commit();
+
+        // Clear the cart from session
+        Session::forget('cart');
+
+        return $pdf->stream('Receipt.pdf');
+
+    } catch (\Exception $e) {
+        DB::rollback();
+
+        // Catch and display error
+        dd("Error:", $e->getMessage());
+
+        return redirect()->route('service.shoppingCart')->with('error', $e->getMessage());
+    }
+}
+
+
+
+
 
     public function getTransacts(TransactionsDataTable $dataTable)
     {

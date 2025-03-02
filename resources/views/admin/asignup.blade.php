@@ -13,10 +13,6 @@
                     <input type="text" name="fname" id="name" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label for="address"> Address: </label>
-                    <input type="text" name="addressline" id="address" class="form-control">
-                </div>
-                <div class="form-group">
                     <label for="email">Email: </label>
                     <input type="text" name="email" id="email" class="form-control">
                 </div>

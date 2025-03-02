@@ -40,52 +40,87 @@ class GroomingserviceController extends Controller
         //
     }
 
-    public function store(Request $request)
-    {
+    // public function store(Request $request)
+    // {
 
-        $validator = Validator::make($request->all(), GroomingService::$rules);
+    //     $validator = Validator::make($request->all(), GroomingService::$rules);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator);
-        }
-        if ($validator->passes()) {
-            $input = $request->all();
+    //     if ($validator->fails()) {
+    //         return redirect()->back()->withInput()->withErrors($validator);
+    //     }
+    //     if ($validator->passes()) {
+    //         $input = $request->all();
 
-            $request->validate([
-            'image' => 'image'
-            ]);
+    //         $request->validate([
+    //         'image' => 'image'
+    //         ]);
 
-            if($file = $request->hasFile('image')) {
-            $file = $request->file('image') ;
+    //         if($file = $request->hasFile('image')) {
+    //         $file = $request->file('image') ;
 
-            $fileName = uniqid().'_'.$file->getClientOriginalName();
+    //         $fileName = uniqid().'_'.$file->getClientOriginalName();
 
-            $destinationPath = public_path().'/images';
+    //         $destinationPath = public_path().'/images';
 
-            $input['img_path'] = $fileName;
+    //         $input['img_path'] = $fileName;
 
-            $file->move($destinationPath,$fileName);
-        }
-            }
-            GroomingService::create($input);
-            return Redirect::to('/grooming')->with('success','New Grooming Service added!');
+    //         $file->move($destinationPath,$fileName);
+    //     }
+    //         }
+    //         GroomingService::create($input);
+    //         return Redirect::to('/grooming')->with('success','New Grooming Service added!');
 
 
-        // $input = $request->all();
-        //  $request->validate([
-        //     'image' => 'image'
-        // ]);
+    //     // $input = $request->all();
+    //     //  $request->validate([
+    //     //     'image' => 'image'
+    //     // ]);
 
-        //  if($file = $request->hasFile('image')) {
-        //     $file = $request->file('image') ;
-        //     $fileName = uniqid().'_'.$file->getClientOriginalName();
-        //     $destinationPath = public_path().'/images';
-        //     $input['img_path'] = $fileName;
-        //     $file->move($destinationPath,$fileName);
-        // }
-        // GroomingService::create($input);
-        //  return Redirect::to('/grooming')->with('success','Grooming service has been updated!');
+    //     //  if($file = $request->hasFile('image')) {
+    //     //     $file = $request->file('image') ;
+    //     //     $fileName = uniqid().'_'.$file->getClientOriginalName();
+    //     //     $destinationPath = public_path().'/images';
+    //     //     $input['img_path'] = $fileName;
+    //     //     $file->move($destinationPath,$fileName);
+    //     // }
+    //     // GroomingService::create($input);
+    //     //  return Redirect::to('/grooming')->with('success','Grooming service has been updated!');
+    // }
+
+  public function store(Request $request)
+{
+    // Validate request
+    $request->validate([
+        'service_name' => 'required',
+        'service_cost' => 'required|numeric',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    ]);
+
+    // Handle file upload
+    $imgPath = null;
+    if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        $fileName = uniqid() . '_' . $file->getClientOriginalName();
+        $destinationPath = public_path('/images');
+        $file->move($destinationPath, $fileName);
+        $imgPath = $fileName;
     }
+
+    // Create Grooming Service
+    $groomingService = GroomingService::create([
+        'service_name' => $request->service_name,
+        'service_cost' => $request->service_cost,
+        'img_path' => $imgPath,
+    ]);
+
+    // Debugging: Check if saving was successful
+    if ($groomingService) {
+        return redirect('/grooming')->with('success', 'New Grooming Service added!');
+    } else {
+        dd('Failed to save data');
+    }
+}
+
 
     public function show($service_id)
     {
@@ -107,6 +142,8 @@ class GroomingserviceController extends Controller
     {
 
         $groomingservice = GroomingService::find($service_id);
+        $groomingservice->service_name = $request->service_name;
+        $groomingservice->service_cost = $request->service_cost;
 
 
          if($file = $request->hasFile('image')) {
@@ -117,6 +154,7 @@ class GroomingserviceController extends Controller
             $destinationPath = public_path().'/images';
 
             $input['img_path'] = $fileName;
+
 
             $file->move($destinationPath,$fileName);
         }

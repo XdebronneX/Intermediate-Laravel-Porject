@@ -17,9 +17,9 @@ class Disease extends Model
     protected $fillable = ['disease_name'];
     public static $rules = ['disease_name'=>'required'];
 
-    public function consults()
-    {
-        // return $this->belongsToMany('App\Models\Consultation', 'disease_id')->withPivot('consult_disease');
-        return $this->belongsToMany('App\Models\Consultation');
-    }
+public function consultations()
+{
+    return $this->belongsToMany(Consultation::class, 'consultation_disease', 'disease_id', 'consult_id');
+}
+
 }

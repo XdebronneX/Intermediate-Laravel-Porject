@@ -4,34 +4,26 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class Role
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle($request, Closure $next, ...$roles)
     {
-        // $user = Auth::user();
-        // if( $user->isAdmin){
-        //         return $next($request);
-        //     }
-        // dd($user->role);
-        // dd($roles);
-        if(! Auth::user())
-            return redirect()->back();
-        // dd(Auth::user()->role);
-        foreach($roles as $role) {
-            if(Auth::user()->role === $role){
-                // dump($role);
-                return $next($request);
-             }
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+        return redirect()->route('user.signin')->with('info', 'You must be logged in to access this page.');
         }
-        return redirect()->back(); 
+
+        // Check if the user's role is authorized
+        if (!in_array(Auth::user()->role, $roles)) {
+            return redirect()->back()->with('warning', 'You are not authorized to access this page.');
+        }
+
+        return $next($request);
     }
 }

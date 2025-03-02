@@ -13,7 +13,7 @@ class LoginController extends Controller
         {
             if (auth()->user()->role === 'admin') 
             {
-                return redirect()->route('dashboard.index');
+                 return redirect()->route('user.aprofile');
             } 
             else if (auth()->user()->role === 'employee')
             {
@@ -29,8 +29,13 @@ class LoginController extends Controller
             return redirect()->route('user.signin')->with('error','Email-Address And Password Are Wrong.');
         }
      }
-     public function logout(){
-        Auth::logout();
-        return redirect()->guest('/user.signin');
-    }
+    //  public function logout(){
+    //     Auth::logout();
+    //     return redirect()->guest('/user.signin');
+    // }
+    public function logout()
+{
+    Auth::logout();
+    return redirect()->route('user.signin'); // Redirecting to signin page
+}
 }

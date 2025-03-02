@@ -13,11 +13,10 @@ class Admin extends Model
     public $timestamps = true;
 
     protected $guarded = ['admin_id','img_path'];
-    protected $fillable = ['fname','addresslinee','img_path'];
+    protected $fillable = ['fname','img_path'];
 
    public static $rules = [ 
                 'fname'=>'required',
-                'addressline'=>'required',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg'
              ];
 

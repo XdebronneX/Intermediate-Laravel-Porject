@@ -5,13 +5,7 @@ namespace App\DataTables;
 use App\Models\Consultation;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-use App\Models\Pet;
-use App\Models\Disease;
-use App\Models\Employee;
-
 
 class ConsultationsDataTable extends DataTable
 {
@@ -23,38 +17,35 @@ class ConsultationsDataTable extends DataTable
      */
     public function dataTable($query)
     {
-
-
-        $consults = Consultation::with(['pet','disease','employee'])->select('health_consultation.*');
-        // $customers = Customer::withTrashed()->with('pets','users')->orderBy('customer_id','DESC');
+        $consults = Consultation::with(['pet', 'diseases', 'employee'])->select('health_consultation.*');
 
         return datatables()
-        ->eloquent($consults)
-        ->addColumn('edit', function($row) {
-            return "<a href=". route('consult.edit', $row->consult_id). " class=\"btn btn-warning\">Edit</a>";
-        })
-        ->addColumn('delete', function($row) {
-            return "
-            <form action=". route('consult.destroy', $row->consult_id). " method= \"POST\" >". csrf_field() .
-             '<input name="_method" type="hidden" value="DELETE">
-            <button class="btn btn-danger" type="submit">Delete</button>
-              </form>';
-        })
-        ->addColumn('employee', function (Consultation $consults) {
-            return $consults->employee->lname;
-        })
-        ->addColumn('pet', function (Consultation $consults) {
-            return $consults->pet->pname;
-        })
-        
-        ->addColumn('disease', function (Consultation $consults) {
-                return $consults->disease->map(function($disease) {
-                return "<li>".$disease->disease_name. "</li>";
-                })->implode('<br>'); 
+            ->eloquent($consults)
+            ->addColumn('edit', function ($row) {
+                return "<a href=" . route('consult.edit', $row->consult_id) . " class=\"btn btn-info\">Edit</a>";
+            })
+            ->addColumn('delete', function ($row) {
+                return "
+                <form action=" . route('consult.destroy', $row->consult_id) . " method=\"POST\">" . csrf_field() .
+                '<input name="_method" type="hidden" value="DELETE">
+                <button class="btn btn-danger" type="submit">Delete</button>
+                </form>';
+            })
+            ->addColumn('employee', function (Consultation $consults) {
+                return $consults->employee->lname;
+            })
+            ->addColumn('pet', function (Consultation $consults) {
+                return $consults->pet->pname;
+            })
+            ->addColumn('diseases', function (Consultation $consults) {
+                return '<ul style="padding-left: 20px; list-style-type: disc;">' . 
+                $consults->diseases->map(function ($disease) {
+                return "<li>{$disease->disease_name}</li>";
+            })->implode('') . 
+            '</ul>';
             })
 
-        ->rawColumns(['pet','employee','disease','edit','delete']);      
-
+            ->rawColumns(['pet', 'employee', 'diseases', 'edit', 'delete']);
     }
 
     /**
@@ -65,7 +56,7 @@ class ConsultationsDataTable extends DataTable
      */
     public function query(Consultation $model)
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['pet', 'diseases', 'employee']);
     }
 
     /**
@@ -76,18 +67,15 @@ class ConsultationsDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-                    ->setTableId('health_consultation-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    ->dom('Bfrtip')
-                    ->orderBy(0)
-                    ->buttons(
-                        Button::make('create'),
-                        Button::make('export'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    );
+            ->setTableId('health_consultation-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            ->dom('Bfrtip')
+            ->orderBy(0)
+            ->buttons(
+                Button::make('excel'),
+                Button::make('csv'),
+            );
     }
 
     /**
@@ -98,10 +86,9 @@ class ConsultationsDataTable extends DataTable
     protected function getColumns()
     {
         return [
-            
             Column::make('consult_id'),
             Column::make('pet')->name('pet.pname')->title('Pets'),
-            Column::make('disease')->name('disease.disease_name')->title('Diseases'),
+            Column::make('diseases')->name('diseases.disease_name')->title('Diseases'),
             Column::make('employee')->name('employee.lname')->title('Veterinarian'),
             Column::make('observation')->title('Comment'),
             Column::make('consult_cost')->title('Cost'),
@@ -109,10 +96,9 @@ class ConsultationsDataTable extends DataTable
             Column::make('updated_at'),
             Column::computed('edit'),
             Column::computed('delete')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
+                ->exportable(false)
+                ->width(60)
+                ->addClass('text-center'),
         ];
     }
 

@@ -25,13 +25,23 @@ class GroomingServiceDataTable extends DataTable
 
         return datatables()
         ->eloquent($query)
-        ->addColumn('action', function($row){
-            return "<a href=". route('grooming.edit', $row->service_id). " class=\"btn btn-warning\">Edit</a>
-                    <form action=". route('grooming.destroy', $row->service_id). " method= \"POST\" >". csrf_field() .
-                     '<input name="_method" type="hidden" value="DELETE">
-                    <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>';
-        })
+        // ->addColumn('action', function($row){
+        //     return "<a href=". route('grooming.edit', $row->service_id). " class=\"btn btn-warning\">Edit</a>
+        //             <form action=". route('grooming.destroy', $row->service_id). " method= \"POST\" >". csrf_field() .
+        //              '<input name="_method" type="hidden" value="DELETE">
+        //             <button class="btn btn-danger" type="submit">Delete</button>
+        //               </form>';
+        // })
+          ->addColumn('edit', function ($row) {
+                return "<a href=" . route('grooming.edit', $row->service_id) . " class=\"btn btn-info\">Edit</a>";
+            })
+            ->addColumn('delete', function ($row) {
+                return "
+                <form action=" . route('grooming.destroy', $row->service_id) . " method=\"POST\">" . csrf_field() .
+                '<input name="_method" type="hidden" value="DELETE">
+                <button class="btn btn-danger" type="submit">Delete</button>
+                </form>';
+            })
 
         ->addColumn('img_path', function($groomingservices){
             $url= asset('images/'.$groomingservices->img_path);
@@ -39,7 +49,7 @@ class GroomingServiceDataTable extends DataTable
 
            })
 
-           ->rawColumns(['img_path','action']);
+           ->rawColumns(['img_path','edit','delete']);
     }
 
     /**
@@ -49,9 +59,11 @@ class GroomingServiceDataTable extends DataTable
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(GroomingService $model)
-    {
-        return $model->newQuery();
-    }
+{
+    return $model->newQuery();
+}
+
+
 
     /**
      * Optional method if you want to use html builder.
@@ -65,13 +77,10 @@ class GroomingServiceDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom('Bfrtip')
-                    ->orderBy(1)
+                    ->orderBy(0, 'desc')
                     ->buttons(
-                       // Button::make('create'),
-                        //Button::make('export'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
+                        Button::make('excel'),
+                        Button::make('csv'),
                     );
     }
 
@@ -83,16 +92,15 @@ class GroomingServiceDataTable extends DataTable
     protected function getColumns()
     {
         return [
-
-            Column::make('service_id'),
+            Column::make('service_id')->title('ID'),
             Column::make('service_name')->title('Service Name'),
             Column::make('service_cost')->title('Service Cost'),
             Column::make('img_path')->title('Image'),
             Column::make('created_at'),
             Column::make('updated_at'),
-            Column::computed('action')
+            Column::make('edit'),
+            Column::make('delete')
             ->exportable(false)
-            ->printable(false)
             ->width(60)
             ->addClass('text-center'),
         ];

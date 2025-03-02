@@ -1,24 +1,24 @@
 @extends('layouts.main')
-@section('title')
-    laravel shopping cart
-@endsection
-@section('content')
-    @foreach ($transacts->chunk(10) as $itemtransact)
-        <div class="row">
-            @foreach ($itemtransact as $transact)
-                <div class="col-sm-6 col-md-4">
-                    <div class="thumbnail">
-                        <img src="{{ asset('images/' . $transact->img_path) }}" width="180" height="180">
-                        <h3>
-                            <center><strong><span>{{ $transact->service_name }}</span></strong></center>
-                        </h3>
-                        <center><a href="{{ route('comment.petid', ['id' => $transact->service_id]) }}"
-                                class="btn btn-primary" role="button">Comment</a> </center>
-                    </div>
-                    <div class="caption">
 
-                    </div>
+@section('title', 'Laravel Shopping Cart')
+
+@section('content')
+<div class="container mx-auto px-6 py-10">
+    @foreach ($transacts->chunk(10) as $itemtransact)
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach ($itemtransact as $transact)
+                <div class="bg-white shadow-lg rounded-lg p-5 text-center">
+                    <img src="{{ asset('images/' . $transact->img_path) }}" alt="{{ $transact->service_name }}" class="w-44 h-44 object-cover mx-auto rounded-md">
+                    
+                    <h3 class="mt-4 font-bold text-lg text-[#626F47]">{{ $transact->service_name }}</h3>
+                    
+                    <a href="{{ route('comment.petid', ['id' => $transact->service_id]) }}" 
+                       class="mt-4 inline-block bg-[#626F47] text-white px-6 py-2 rounded-lg shadow-md hover:bg-[#A4B465] focus:outline-none focus:ring-2 focus:ring-[#FFCF50]">
+                        Comment
+                    </a>
                 </div>
             @endforeach
+        </div>
     @endforeach
+</div>
 @endsection

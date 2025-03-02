@@ -1,69 +1,36 @@
 @extends('layouts.main')
 @section('content')
-<style >
- .login-box{
-    background: linear-gradient(#141e30, #243b55);
-    color: #FFFFFF;
-    }
-</style>
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            @if (count($errors) > 0)
-                @include('layouts.flash-messages')
-            @endif
-            <div class="login-box">
-                 <h2>Sign in</h2>
-            <form class="" action="{{ route('user.signin') }}" method="post" enctype="multipart/form-data">
-                {{ csrf_field() }}
-                <div class="user-box">
-                    <label for="email">Email: </label>
-                    <input type="text" name="email" id="email" class="form-control">
-                    @if($errors->has('email'))
-                    <div class="error">{{ $errors->first('email') }}</div>
+
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-[#626F47] p-8 rounded-lg shadow-lg w-96 text-white">
+        <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
+
+        @if (count($errors) > 0)
+            @include('layouts.flash-messages')
+        @endif
+
+        <form action="{{ route('user.signin') }}" method="post" enctype="multipart/form-data">
+            {{ csrf_field() }}
+
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium">Email:</label>
+                <input type="text" name="email" id="email" placeholder="Enter your email" class="w-full p-2 rounded border border-gray-300 text-gray-900">
+                @if($errors->has('email'))
+                    <div class="text-red-400 text-sm mt-1">{{ $errors->first('email') }}</div>
                 @endif
-                </div>
-               <div class="user-box">
-                <label for="password">Password: </label>
-                <input type="password" name="password" id="password" class="form-control">
-                    @if($errors->has('password'))
-                    <div class="error">{{ $errors->first('password') }}</div>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="block text-sm font-medium">Password:</label>
+                <input type="password" name="password" id="password" placeholder="Enter your password" class="w-full p-2 rounded border border-gray-300 text-gray-900">
+                @if($errors->has('password'))
+                    <div class="text-red-400 text-sm mt-1">{{ $errors->first('password') }}</div>
                 @endif
-                </div>
-                     <input type="submit" value="SignIn" class="btn btn-primary">
-             </form>
-        </div>
+            </div>
+
+            <button type="submit" class="w-full bg-[#FFCF50] text-[#626F47] font-bold py-2 px-4 rounded hover:bg-yellow-400 transition">Sign In</button>
+        </form>
     </div>
+</div>
+
 @endsection
-
-
-
-
-{{-- @extends('layouts.master')
-@section('content')
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <h1>Sign In</h1>
-            @if (count($errors) > 0)
-                @include('layouts.flash-messages')
-            @endif
-            <form class="" action="{{ route('user.signin') }}" method="post">
-                {{ csrf_field() }}
-                <div class="form-group">
-                    <label for="email">Email: </label>
-                    <input type="text" name="email" id="email" class="form-control">
-                    @if($errors->has('email'))
-                        <div class="error">{{ $errors->first('email') }}</div>
-                    @endif
-                </div>
-                <div class="form-group">
-                    <label for="password">Password: </label>
-                    <input type="password" name="password" id="password" class="form-control">
-                    @if($errors->has('password'))
-                        <div class="error">{{ $errors->first('password') }}</div>
-                    @endif
-                </div>
-                    <input type="submit" value="Sign In" class="btn btn-primary">
-             </form>
-        </div>
-    </div>
-@endsection --}}

@@ -45,6 +45,7 @@ class UserController extends Controller
          $customer->addressline = $request->addressline;
          $customer->phone = $request->phone;
          $customer->zipcode = $request->zipcode;
+         $customer->town = $request->town;
 
          $request->validate([
             'image' => 'image' 
@@ -102,7 +103,7 @@ class UserController extends Controller
         $employee->user_id = $user->id;
         $employee->position = $request->position;
         $employee->title = $request->title;
-        $employee->title = $request->title;
+        $employee->town = $request->town;
         $employee->fname = $request->fname;
         $employee->lname = $request->lname;
         $employee->addressline = $request->addressline;
@@ -159,7 +160,6 @@ class UserController extends Controller
             $admin = new Admin;
             $admin->user_id = $user->id;
             $admin->fname = $request->fname;
-            $admin->addressline = $request->addressline;
           
             $request->validate([
                'image' => 'image' 
@@ -175,6 +175,7 @@ class UserController extends Controller
             $admin->img_path= $input['img_path'];  
             $admin->save();
             Auth::login($user);
+
             // return redirect()->route('dashboard.index'); //dapat ito
             return redirect()->route('user.aprofile'); // pansamantala
         }
@@ -184,7 +185,7 @@ class UserController extends Controller
             $admins = DB::table('admins')
         
                 ->leftJoin('users', 'id','admins.user_id')
-                ->select('admins.admin_id','users.email','admins.fname','admins.addressline','admins.img_path')
+                ->select('admins.admin_id','users.email','admins.fname','admins.img_path')
                 ->where('admins.user_id','=',$profile)
                 ->get();
             return view('user.aprofile',compact('admins'));

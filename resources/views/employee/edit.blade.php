@@ -1,110 +1,83 @@
 @extends('layouts.main')
+
 @section('content')
-<div class="container">
-  <h2>Edit Employee Section</h2>
-   {{ Form::model($employees,['route' => ['employee.update',$employees->emp_id],'method'=>'PUT','enctype' =>'multipart/form-data']) }}
+<div class="container mx-auto p-8 bg-gray-50 rounded-lg shadow-md">
+    <h2 class="text-3xl font-bold text-[#626F47] mb-6">Edit Employee</h2>
 
+    {{ Form::model($employees, ['route' => ['employee.update', $employees->emp_id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) }}
 
-   <div class="form-group"> 
-    <label for="name" class="control-label">Title: </label>
-    {{ Form::text('title',null,array('class'=>'form-control','emp_id'=>'title', 'readOnly')) }}
-    @if($errors->has('title'))
-    <small>{{ $errors->first('title') }}</small>
-    @endif
-  </div>
+    <!-- Form Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-   <div class="form-group"> 
-    <label for="fname" class="control-label">First Name: </label>
-    {{ Form::text('fname',null,array('class'=>'form-control','emp_id'=>'fname', 'readOnly')) }}
-    @if($errors->has('fname'))
-    <small>{{ $errors->first('fname') }}</small>
-    @endif
-  </div>
+        @php
+            $inputStyles = "mt-1 block w-full px-4 py-3 border-2 border-[#626F47] bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#A4B465] focus:border-[#A4B465] placeholder-gray-500";
+            $readonlyStyles = "bg-gray-200 cursor-not-allowed";
+        @endphp
 
-  <div class="form-group"> 
-    <label for="lname" class="control-label">Last name: </label>
-    {{ Form::text('lname',null,array('class'=>'form-control','emp_id'=>'lname', 'readOnly')) }}
-    @if($errors->has('lname'))
-    <small>{{ $errors->first('lname') }}</small>
-    @endif
-  </div> 
+        <!-- Title -->
+        <div>
+            <label for="title" class="block text-sm font-semibold text-[#626F47]">Title:</label>
+            {{ Form::text('title', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('title') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-  <div class="form-group"> 
-    <label for="addressline" class="control-label">Addressline: </label>
-    {{ Form::text('addressline',null,array('class'=>'form-control','emp_id'=>'addressline', 'readOnly')) }}
-    @if($errors->has('addressline'))
-    <small>{{ $errors->first('addressline') }}</small>
-    @endif
-  </div>
-  <div class="form-group"> 
-    <label for="zipcode" class="control-label">Zipcode:</label>
-    {{ Form::text('zipcode',null,array('class'=>'form-control','emp_id'=>'zipcode', 'readOnly')) }}
-    @if($errors->has('zipcode'))
-    <small>{{ $errors->first('zipcode') }}</small>
-    @endif
-  </div>
-  <div class="form-group"> 
-    <label for="phone" class="control-label">Phone:</label>
-    {{ Form::text('phone',null,array('class'=>'form-control','emp_id'=>'phone', 'readOnly')) }}
-    @if($errors->has('phone'))
-    <small>{{ $errors->first('phone') }}</small>
-    @endif
-  </div>
+        <!-- First Name -->
+        <div>
+            <label for="fname" class="block text-sm font-semibold text-[#626F47]">First Name:</label>
+            {{ Form::text('fname', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('fname') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-{{-- <div class="form-group">
-    @foreach($users as $user)
-    <label for="email" class="control-label">Email: </label>
-    {{ Form::text('email', $user->email,array('class'=>'form-control','id'=>'email', 'readOnly')) }}
+        <!-- Last Name -->
+        <div>
+            <label for="lname" class="block text-sm font-semibold text-[#626F47]">Last Name:</label>
+            {{ Form::text('lname', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('lname') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-    @if($errors->has('email'))
-     <small>{{ $errors->first('email') }}</small>
-    @endif
-    @endforeach
-</div> --}}
+        <!-- Address Line -->
+        <div>
+            <label for="addressline" class="block text-sm font-semibold text-[#626F47]">Address:</label>
+            {{ Form::text('addressline', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('addressline') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-{{-- <div class="form-group"> 
-  @foreach($users as $user)
-  <label for="password" class="control-label">Password</label>
-  <input type="password" class="form-control " id="password" name="password" value="('password', $user->password)">
-  </text>@if($errors->has('password'))
-  <div class="alert alert-danger">{{ $errors->first('password') }}</div>
- @endif 
- @endforeach
-</div>  --}}
+        <!-- Zipcode -->
+        <div>
+            <label for="zipcode" class="block text-sm font-semibold text-[#626F47]">Zipcode:</label>
+            {{ Form::text('zipcode', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('zipcode') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-{{-- <div class="form-group">
-  <label for="image" class="control-label">Employee Image:</label>
-  <input type="file" class="form-control" id="image" name="image">
-   <img src="{{ asset('images/'.$employee->img_path) }}" width ="100" height="100" class="img-circle" enctype="multipart/form-data"/>
-  @if($errors->has('img_path'))
-   <div class="alert alert-danger">{{ $errors->first('img_path') }}</div>
-  @endif
-</div> --}}
+        <!-- Phone -->
+        <div>
+            <label for="phone" class="block text-sm font-semibold text-[#626F47]">Phone:</label>
+            {{ Form::text('phone', null, ['class' => "$inputStyles $readonlyStyles", 'readonly' => 'readonly']) }}
+            @error('phone') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
 
-{{-- @if (Auth::check() && Auth::user()->roles == 'Admin')
-  <div class="form-group"> 
-      <label for="position" class="control-label">Position:</label>
-         {!! Form::select('position',[ 'receptionist' => 'receptionist', 'veterinarian' => 'veterinarian','groomer'=>'groomer'], null,['class' => 'form-control','emp_id'=>'position']) !!}
-  </div>
-  @else
-     <div class="form-group"> 
-    <label for="position" class="control-label">Position</label>
-    {{ Form::text('position',null,array('class'=>'form-control','emp_id'=>'position', 'readonly')) }}
-  </div>
-  @endif --}}
+        <!-- Position (Editable) -->
+        <div>
+            <label for="position" class="block text-sm font-semibold text-[#626F47]">Position:</label>
+            {!! Form::select('position', [
+                'Veterinarian' => 'Veterinarian',
+                'Groomer' => 'Groomer',
+                'Receptionist' => 'Receptionist'
+            ], null, ['class' => $inputStyles]) !!}
+            @error('position') <small class="text-[#FFCF50]">{{ $message }}</small> @enderror
+        </div>
+    </div>
 
-  <div>
-    <label for="position">Position</label>
-    {!! Form::select('position', array('Veterinarian' => 'veterinarian', 'Groomer' => 'groomer',
-    'Receptionist' => 'receptionist'), null, ['emp_id' => 'position', 'class' => 'form-control',]) !!}
-    @if ($errors->has('position'))
-    <p>{{ $errors->first('position') }}</p>
-    @endif
+    <!-- Buttons -->
+    <div class="flex items-center space-x-4 mt-6">
+        <button type="submit" class="px-6 py-2 bg-[#626F47] text-white font-semibold rounded-lg hover:bg-[#A4B465] focus:outline-none focus:ring-2 focus:ring-[#A4B465] focus:ring-opacity-50 shadow-md">
+            Update
+        </button>
+        <a href="{{ url()->previous() }}" class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 focus:outline-none shadow-md">
+            Cancel
+        </a>
+    </div>
+
+    {!! Form::close() !!}
 </div>
-<br>
-<button type="submit" class="btn btn-primary">Update</button>
-<a href="{{url()->previous()}}" class="btn btn-default" role="button">Cancel</a>
-  </div>     
-</div>
-{!! Form::close() !!} 
 @endsection

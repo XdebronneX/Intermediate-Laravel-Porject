@@ -20,6 +20,7 @@ class Consultation extends Model
    public static $rules = [ 
                 'pet_id' =>'required',
                 'emp_id'=>'required',
+                'disease_id' => 'array|nullable',
                 'observation'=>'required',
                 'consult_cost'=>'numeric',
              ];
@@ -29,10 +30,12 @@ class Consultation extends Model
         return $this->belongsTo('App\Models\Pet', 'pet_id');
     }
 
-    public function disease(){
-        // return $this->belongsToMany('App\Models\Disease', 'disease_id')->withPivot('consult_disease');
-        return $this->belongsToMany('App\Models\Disease');
-    }
+public function diseases()
+{
+    return $this->belongsToMany(Disease::class, 'consultation_disease', 'consult_id', 'disease_id');
+}
+
+
 
     public function employee() 
     {

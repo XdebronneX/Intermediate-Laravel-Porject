@@ -10,49 +10,52 @@ use Spatie\Searchable\SearchResult;
 
 class Pet extends Model implements Searchable
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     public $table = 'pets';
     public $primaryKey = 'pet_id';
     public $timestamps = true;
 
     protected $guarded = ['pet_id','img_path'];
-    protected $fillable = ['customer_id','breed','pname','gender','age','img_path'];
+    protected $fillable = ['customer_id', 'petb_id', 'pname', 'gender', 'age', 'img_path'];
 
-   public static $rules = [
-               'customer_id' =>'required',
-               'pname'=>'required',
-               'breed'=>'required',
-                'gender'=>'required',
-                'age'=>'numeric',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg'
-             ];
+    public static $rules = [
+        'customer_id' =>'required',
+        'pname'=>'required',
+        'petb_id'=>'required',
+        'gender'=>'required',
+        'age'=>'numeric',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg'
+    ];
 
-    public function customers()
+    public function customer()
     {
         return $this->belongsTo('App\Models\Customer', 'customer_id')->withTrashed();
-        // return $this->belongsTo(Customer::class, 'customer_id');
-
     }
 
-    public function consults(){
+    public function breed()
+    {
+        return $this->belongsTo('App\Models\Breed', 'petb_id');
+    }
+
+    public function consults()
+    {
         return $this->hasMany('App\Models\Consultation', 'pet_id');
     }
+
     public function transacts()
     {
         return $this->hasMany('App\Models\Transaction', 'pet_id');
     }
 
-        public function getSearchResult(): SearchResult
-        {
-            $url = $this->pet_id;
-            return new SearchResult(
-                $this,
-                $this->pname,
-                $url
-            );
-        }
-
-
+    public function getSearchResult(): SearchResult
+    {
+        $url = $this->pet_id;
+        return new SearchResult(
+            $this,
+            $this->pname,
+            $url
+        );
+    }
 }
+

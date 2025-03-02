@@ -66,20 +66,6 @@
         </div>
     @endforeach
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {{-- <div class="md-form mb-5"></div> --}}
     <div class="modal-footer d-flex justify-content-center">
         <button type="submit" class="btn btn-success">Save</button>

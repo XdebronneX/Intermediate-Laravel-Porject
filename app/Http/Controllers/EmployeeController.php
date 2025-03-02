@@ -17,6 +17,7 @@ use Hash;
 use App\Imports\EmployeeImports;
 use Excel;
 use App\Rules\ExcelRule;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -66,7 +67,7 @@ class EmployeeController extends Controller
          $employee->user_id = $user->id;
          $employee->position = $request->position;
          $employee->title = $request->title;
-         $employee->title = $request->title;
+         $employee->town = $request->town;
          $employee->fname = $request->fname;
          $employee->lname = $request->lname;
          $employee->addressline = $request->addressline;
@@ -166,10 +167,11 @@ class EmployeeController extends Controller
         public function update(Request $request, $emp_id)
         {
             $employees = Employee::find($emp_id);
-            $employees->position = $request->input('position');
+            $employees->position = $request->position;
             $employees->update();
 
-            return Redirect::to('/getEmployees')->with('success','Employee has been updated!');
+        return Redirect::to('/employees')->with('success', 'Employee has been updated!');
+
         }
 
     /**
@@ -216,24 +218,38 @@ class EmployeeController extends Controller
     // }
 
 
+//  public function updateUser(Request $request, $id)
+// {
+//     // Debugging: Check if function is being called
+//     // dd("updateUser function is being called");
 
-    public function updateUser(Request $request,  $id)
-    {
-        $user = User::find($id);
+//     // Find the user by ID
+//     $user = User::find($id);
 
-        $validator = Validator::make($request->all(), User::$rules);
-        
-        if ($validator->fails()) {
-            // dd($validator);
-            return redirect()->back()->withInput()->withErrors($validator);
-        }
+//     // Debugging: Check if user exists
+//     if (!$user) {
+//         dd("User not found with ID: " . $id);
+//     }
 
-                        $input = $request->all();           
-                        $breed->update($input);
-        // return Redirect::to('/breed')->with('success','breed has been updated!');
-        return Redirect::to('user.aprofile');
-       
-    }
+//     // Debugging: Log the request data
+//     Log::info('UpdateUser request data:', $request->all());
+
+//     // Validate the request
+//     $validator = Validator::make($request->all(), User::$rules);
+
+//     if ($validator->fails()) {
+//         return redirect()->back()->withInput()->withErrors($validator);
+//     }
+
+//     // Debugging: Dump request data
+//     dd($request->all());
+
+//     // Update user
+//     $user->update($request->all());
+
+//     return Redirect::to('user.aprofile')->with('success', 'User has been updated!');
+// }
+
 
     /**
      * Remove the specified resource from storage.

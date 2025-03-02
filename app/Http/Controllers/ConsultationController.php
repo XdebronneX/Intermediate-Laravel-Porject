@@ -45,45 +45,45 @@ class ConsultationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {   
-        // $input = $request->all();
-        // $employees = Employee::find($request->emp_id);
-        // $pets = Pet::find($request->pet_id);
+public function store(Request $request)
+{   
+    // Step 1: Debug Incoming Request Data
+    // dd($request->all()); // Check if the request contains all required data
 
-        // $consults = new Consultation();
-        // $consults->employee()->associate($employees);
-        // $consults->pet()->associate($pets);   
-        // $consults->observation = $request->observation;
-        // $consults->consult_cost = $request->consult_cost;
-        // // $consults = Consultation::create($input);
-        // // $consults->save($input);
-        // $consults->save();
-        // foreach ($request->disease_id as $disease_id) {
-        //     DB::table('consultation_disease')->insert(
-        //                 ['disease_disease_id' => $disease_id, 
-        //                  'consultation_consult_id' => $consults->consult_id]
-        //                 );
-        //     if(!(empty($request->disease_id))) 
-        //         {
-        //             $consults->disease()->attach($request->$disease_id);
-        //         } 
-        //     }
-        //     Event::dispatch(new SendCheckupMail($consults));
-        //     return Redirect::to('/consults')->with('success','Consultation created successfully!');
+    // Step 2: Validate Request
+    $validatedData = $request->validate([
+        'pet_id' => 'required|exists:pets,pet_id',
+        'emp_id' => 'required|exists:employees,emp_id',
+        'observation' => 'required|string',
+        'consult_cost' => 'numeric|nullable',
+        'disease_id' => 'array|nullable',
+        'disease_id.*' => 'exists:disease_injuries,disease_id'
+    ]);
 
+    // Step 3: Create Consultation
+    $consultation = Consultation::create([
+        'pet_id' => $validatedData['pet_id'],
+        'emp_id' => $validatedData['emp_id'],
+        'observation' => $validatedData['observation'],
+        'consult_cost' => $validatedData['consult_cost'] ?? null,
+    ]);
 
+    // dd($consultation); // Check if consultation is created
 
-        $input = $request->all();
-        $consults = Consultation::create($input);
-        // Event::dispatch(new SendCheckupMail($consults));
-           if(!(empty($request->disease_id))) 
-                {
-                    $consults->disease()->attach($request->disease_id);
-                } 
-                Event::dispatch(new SendCheckupMail($consults));
-                return Redirect::to('/consults')->with('success','Consultation created successfully!');
+    // Step 4: Attach Diseases (if selected)
+    if (!empty($request->disease_id)) {
+        $consultation->diseases()->attach($request->disease_id);
     }
+
+    // dd($consultation->diseases()->get()); // Check if diseases are attached
+
+    // Step 5: Dispatch Email Event
+    Event::dispatch(new SendCheckupMail($consultation));
+
+    return Redirect::to('/consults')->with('success', 'Consultation created successfully!');
+}
+
+
 
    
 
@@ -109,17 +109,15 @@ class ConsultationController extends Controller
     //     //
     // }
 
-    public function edit($id)
-    {
-            $consult = Consultation::find($id);
-            $consults = DB::table('consultation_disease')
-                            ->where('consultation_consult_id',$id)
-                            ->pluck('disease_disease_id')
-                            ->toArray();
-                         
-             $diseases =Disease::pluck('disease_name','disease_id');
-            return View::make('consultation.edit',compact('consult','consults','diseases'));
-    }
+public function edit($id)
+{
+    $consult = Consultation::with('diseases')->findOrFail($id); // Ensure diseases are loaded
+    $selectedDiseases = $consult->diseases->pluck('disease_id')->toArray(); // Get selected diseases
+    $diseases = Disease::all(); // Fetch all diseases
+
+    return View::make('consultation.edit', compact('consult', 'selectedDiseases', 'diseases'));
+}
+
 
     /**
      * Update the specified resource in storage.
@@ -128,14 +126,26 @@ class ConsultationController extends Controller
      * @param  \App\Models\Consultation  $consultation
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Consultation $consultation, $id)
-    {
-        $consultss = Consultation::find($id);
-        $disease_id = $request->input('disease_id');
-        $consultss->disease()->sync($disease_id);
-        $consultss->update($request->all());
-         return Redirect::to('/consults')->with('success','Listener updated!');
-    }
+public function update(Request $request, $id)
+{
+    $validatedData = $request->validate([
+        'pet_id' => 'required|exists:pets,pet_id',
+        'emp_id' => 'required|exists:employees,emp_id',
+        'observation' => 'required|string',
+        'consult_cost' => 'numeric|nullable',
+        'disease_id' => 'array|nullable',
+        'disease_id.*' => 'exists:disease_injuries,disease_id'
+    ]);
+
+    $consults = Consultation::findOrFail($id);
+    $consults->update($validatedData);
+
+    // Sync diseases (removes old & adds new ones)
+    $consults->diseases()->sync($request->disease_id ?? []);
+
+    return Redirect::to('/consults')->with('success', 'Consultation updated successfully!');
+}
+
 
     /**
      * Remove the specified resource from storage.
@@ -153,7 +163,7 @@ class ConsultationController extends Controller
 
     public function getConsults(ConsultationsDataTable $dataTable)
     {
-        $consults = Consultation::with(['pet','disease','employee'])->get();
+        $consults = Consultation::with(['pet','diseases','employee'])->get();
         $diseases = Disease::get();
         return $dataTable->render('consultation.consults', compact('consults','diseases'));
     }
